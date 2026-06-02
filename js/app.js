@@ -161,12 +161,14 @@ function selectBase(item, el) {
     riceDiff: 0,
     spicyLevel: '普通',
     spicyDiff: 0,
+    sauceType: 'ポークソース（基本）',
+    sauceTypeDiff: 0,
     sauceSize: '普通（増量なし）',
     sauceDiff: 0,
     toppings: [],
     sides: [],
     get totalPrice() {
-      return this.basePrice + this.riceDiff + this.spicyDiff + this.sauceDiff
+      return this.basePrice + this.riceDiff + this.spicyDiff + this.sauceTypeDiff + this.sauceDiff
         + this.toppings.reduce((s, t) => s + t.price, 0)
         + this.sides.reduce((s, t) => s + t.price, 0);
     }
@@ -213,6 +215,22 @@ function renderCustomize() {
           >
             ${s.label}
             <span class="option-diff">${s.diff > 0 ? '+¥'+s.diff : ''}</span>
+          </button>
+        `).join('')}
+      </div>
+    </div>
+
+    <!-- ソースの種類 -->
+    <div class="section-card">
+      <div class="section-title">🍛 ソースの種類</div>
+      <div class="rice-grid">
+        ${MENU.sauceTypes.map(t => `
+          <button
+            class="option-btn ${t.label === o.sauceType ? 'active' : ''}"
+            onclick="selectSauceType('${t.label}', ${t.diff}, this)"
+          >
+            ${t.label}
+            <span class="option-diff">${t.diff > 0 ? '+¥'+t.diff : ''}</span>
           </button>
         `).join('')}
       </div>
@@ -325,6 +343,14 @@ function selectSpicy(label, diff, btn) {
   updateCustomizeTotal();
 }
 
+function selectSauceType(label, diff, btn) {
+  btn.parentElement.querySelectorAll('.option-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  state.currentOrder.sauceType = label;
+  state.currentOrder.sauceTypeDiff = diff;
+  updateCustomizeTotal();
+}
+
 function selectSauce(label, diff, btn) {
   document.querySelectorAll('.option-btn').forEach(b => {
     // ご飯ボタンは別グループなのでsauce専用クラスで区別
@@ -399,6 +425,8 @@ function addToCart() {
     riceDiff: state.currentOrder.riceDiff,
     spicyLevel: state.currentOrder.spicyLevel,
     spicyDiff: state.currentOrder.spicyDiff,
+    sauceType: state.currentOrder.sauceType,
+    sauceTypeDiff: state.currentOrder.sauceTypeDiff,
     sauceSize: state.currentOrder.sauceSize,
     sauceDiff: state.currentOrder.sauceDiff,
     toppings: [...state.currentOrder.toppings],
@@ -434,7 +462,10 @@ function renderCart() {
             <span>辛さ</span><span>${order.spicyLevel}</span>
           </div>
           <div class="cart-detail-row">
-            <span>ソース</span><span>${order.sauceSize}</span>
+            <span>ソースの種類</span><span>${order.sauceType}</span>
+          </div>
+          <div class="cart-detail-row">
+            <span>ソースの量</span><span>${order.sauceSize}</span>
           </div>
           ${order.toppings.length > 0 ? `
             <div class="cart-detail-row">
