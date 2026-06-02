@@ -3,7 +3,7 @@
 // ============================================================
 
 // ★★★ GASデプロイ後にここにURLを貼り付ける ★★★
-const GAS_URL = 'YOUR_GAS_URL_HERE';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbyHVxeID9LarDyQVq7UHwW6-Ht9P_T99MYo-M6Y4oH6OWL3zq5DxfSvdENkdouWkoc/exec';
 
 // アプリの状態
 const state = {
