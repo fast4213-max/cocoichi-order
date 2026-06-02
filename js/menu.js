@@ -56,7 +56,7 @@ const MENU = {
     { id: 'cheese',            category: 'other',   name: 'チーズカレー',                        price: 964,  img: null },
   ],
 
-  // ご飯の量
+  // ご飯の量（ポーク・ベジソース用）
   riceSizes: [
     { label: '150g', diff: -90 },
     { label: '200g', diff: -60 },
@@ -66,6 +66,19 @@ const MENU = {
     { label: '400g', diff: 130 },
     { label: '500g', diff: 260 },
     { label: '600g', diff: 390 },
+  ],
+
+  // ご飯の量（ビーフソース用）
+  // 350g:+78円 / 400g以降:100gにつき+157円
+  riceSizesBeef: [
+    { label: '150g', diff: -90 },
+    { label: '200g', diff: -60 },
+    { label: '250g', diff: -30 },
+    { label: '300g（基本）', diff: 0 },
+    { label: '350g', diff: 78 },
+    { label: '400g', diff: 157 },
+    { label: '500g', diff: 314 },
+    { label: '600g', diff: 471 },
   ],
 
   // 辛さ
