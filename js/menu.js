@@ -82,6 +82,13 @@ const MENU = {
     { label: '20辛',   diff: 200 },
   ],
 
+  // ソースの種類
+  sauceTypes: [
+    { label: 'ポークソース（基本）', diff: 0 },
+    { label: 'ビーフソース', diff: 148 },
+    { label: 'ここイチベジソース', diff: 37 },
+  ],
+
   // ソースの量
   sauceSizes: [
     { label: '普通（増量なし）', diff: 0 },
