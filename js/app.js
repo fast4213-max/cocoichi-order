@@ -132,7 +132,7 @@ function renderBase() {
             <div class="menu-info">
               <div class="menu-name">${item.name}</div>
               ${item.note ? `<div class="menu-note">※${item.note}</div>` : ''}
-              <div class="menu-price">¥${item.price.toLocaleString()}<span class="price-sub">+テイクアウト¥54</span></div>
+              <div class="menu-price">¥${item.price.toLocaleString()}<span class="price-sub">税込・テイクアウト価格</span></div>
             </div>
           </div>
         `).join('')}
