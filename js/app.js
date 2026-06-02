@@ -3,7 +3,7 @@
 // ============================================================
 
 // ★★★ GASデプロイ後にここにURLを貼り付ける ★★★
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbyHVxeID9LarDyQVq7UHwW6-Ht9P_T99MYo-M6Y4oH6OWL3zq5DxfSvdENkdouWkoc/exec';
+const GAS_URL = 'YOUR_GAS_URL_HERE';
 
 // アプリの状態
 const state = {
@@ -161,14 +161,14 @@ function selectBase(item, el) {
     riceDiff: 0,
     spicyLevel: '普通',
     spicyDiff: 0,
+    sauceSize: '普通（増量なし）',
+    sauceDiff: 0,
     toppings: [],
     sides: [],
-    takeoutFee: MENU.TAKEOUT_FEE,
     get totalPrice() {
-      return this.basePrice + this.riceDiff + this.spicyDiff
+      return this.basePrice + this.riceDiff + this.spicyDiff + this.sauceDiff
         + this.toppings.reduce((s, t) => s + t.price, 0)
-        + this.sides.reduce((s, t) => s + t.price, 0)
-        + this.takeoutFee;
+        + this.sides.reduce((s, t) => s + t.price, 0);
     }
   };
   setTimeout(() => renderStep('customize'), 200);
@@ -210,6 +210,22 @@ function renderCustomize() {
           <button
             class="spicy-btn ${s.label === o.spicyLevel ? 'active' : ''} ${getSpicyClass(s.label)}"
             onclick="selectSpicy('${s.label}', ${s.diff}, this)"
+          >
+            ${s.label}
+            <span class="option-diff">${s.diff > 0 ? '+¥'+s.diff : ''}</span>
+          </button>
+        `).join('')}
+      </div>
+    </div>
+
+    <!-- ソースの量 -->
+    <div class="section-card">
+      <div class="section-title">🍲 ソースの量</div>
+      <div class="rice-grid">
+        ${MENU.sauceSizes.map(s => `
+          <button
+            class="option-btn ${s.label === o.sauceSize ? 'active' : ''}"
+            onclick="selectSauce('${s.label}', ${s.diff}, this)"
           >
             ${s.label}
             <span class="option-diff">${s.diff > 0 ? '+¥'+s.diff : ''}</span>
@@ -309,6 +325,19 @@ function selectSpicy(label, diff, btn) {
   updateCustomizeTotal();
 }
 
+function selectSauce(label, diff, btn) {
+  document.querySelectorAll('.option-btn').forEach(b => {
+    // ご飯ボタンは別グループなのでsauce専用クラスで区別
+    if (b.closest('.sauce-grid')) b.classList.remove('active');
+  });
+  // option-btnはご飯と共用なので親で区別できないため直接querySelectorAll
+  btn.parentElement.querySelectorAll('.option-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  state.currentOrder.sauceSize = label;
+  state.currentOrder.sauceDiff = diff;
+  updateCustomizeTotal();
+}
+
 function toggleTopping(id, name, price, cb) {
   const row = cb.closest('.topping-row');
   if (cb.checked) {
@@ -370,9 +399,10 @@ function addToCart() {
     riceDiff: state.currentOrder.riceDiff,
     spicyLevel: state.currentOrder.spicyLevel,
     spicyDiff: state.currentOrder.spicyDiff,
+    sauceSize: state.currentOrder.sauceSize,
+    sauceDiff: state.currentOrder.sauceDiff,
     toppings: [...state.currentOrder.toppings],
     sides: [...state.currentOrder.sides],
-    takeoutFee: state.currentOrder.takeoutFee,
     totalPrice: state.currentOrder.totalPrice,
   });
   renderStep('cart');
@@ -402,6 +432,9 @@ function renderCart() {
           </div>
           <div class="cart-detail-row">
             <span>辛さ</span><span>${order.spicyLevel}</span>
+          </div>
+          <div class="cart-detail-row">
+            <span>ソース</span><span>${order.sauceSize}</span>
           </div>
           ${order.toppings.length > 0 ? `
             <div class="cart-detail-row">
