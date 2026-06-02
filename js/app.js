@@ -163,6 +163,13 @@ function selectBase(item, el) {
     spicyDiff: 0,
     sauceType: 'ポークソース（基本）',
     sauceTypeDiff: 0,
+    // ソース種別変更時にライス差額を再計算するヘルパー
+    recalcRiceDiff() {
+      const sizes = this.sauceType === 'ビーフソース'
+        ? MENU.riceSizesBeef : MENU.riceSizes;
+      const found = sizes.find(r => r.label === this.riceSize);
+      this.riceDiff = found ? found.diff : 0;
+    },
     sauceSize: '普通（増量なし）',
     sauceDiff: 0,
     toppings: [],
@@ -195,7 +202,7 @@ function renderCustomize() {
         ${MENU.riceSizes.map(r => `
           <button
             class="option-btn ${r.label === o.riceSize ? 'active' : ''}"
-            onclick="selectRice('${r.label}', ${r.diff}, this)"
+            onclick="selectRice('${r.label}', this)"
           >
             ${r.label}
             <span class="option-diff">${r.diff === 0 ? '' : r.diff > 0 ? '+¥'+r.diff : '-¥'+Math.abs(r.diff)}</span>
@@ -327,11 +334,11 @@ function getSpicyClass(label) {
   return 'spicy-5';
 }
 
-function selectRice(label, diff, btn) {
-  document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('active'));
+function selectRice(label, btn) {
+  btn.closest('.rice-grid').querySelectorAll('.option-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   state.currentOrder.riceSize = label;
-  state.currentOrder.riceDiff = diff;
+  state.currentOrder.recalcRiceDiff();
   updateCustomizeTotal();
 }
 
@@ -348,7 +355,27 @@ function selectSauceType(label, diff, btn) {
   btn.classList.add('active');
   state.currentOrder.sauceType = label;
   state.currentOrder.sauceTypeDiff = diff;
+  // ソース変更でライス差額も再計算
+  state.currentOrder.recalcRiceDiff();
+  // ライスボタンの表示も更新
+  renderRiceButtons();
   updateCustomizeTotal();
+}
+
+function renderRiceButtons() {
+  const o = state.currentOrder;
+  const sizes = o.sauceType === 'ビーフソース' ? MENU.riceSizesBeef : MENU.riceSizes;
+  const grid = document.querySelector('.rice-grid');
+  if (!grid) return;
+  grid.innerHTML = sizes.map(r => `
+    <button
+      class="option-btn ${r.label === o.riceSize ? 'active' : ''}"
+      onclick="selectRice('${r.label}', this)"
+    >
+      ${r.label}
+      <span class="option-diff">${r.diff === 0 ? '' : r.diff > 0 ? '+¥'+r.diff : '-¥'+Math.abs(r.diff)}</span>
+    </button>
+  `).join('');
 }
 
 function selectSauce(label, diff, btn) {
